@@ -43,7 +43,7 @@ export const Display = async (req,res) => {
         const ex = await Amount.find({id:id}).sort({date:-1});
         var ex1 = [];
         ex.map((items) => {
-            ex1.push({id:items.id,note:decrypt(items.note),amount:decrypt(items.amount),type:items.type,date:items.date,mode:items.mode})
+            ex1.push({_id:items._id,id:items.id,note:decrypt(items.note),amount:decrypt(items.amount),type:items.type,date:items.date,mode:items.mode})
         })
         res.status(200).json(ex1)
     }catch(err){
@@ -52,7 +52,16 @@ export const Display = async (req,res) => {
 }
 
 export const Modify = () => {}
-export const Delete = () => {}
+export const Delete = async(req,res) => {
+    const {id} = req.body;
+    try{
+        await Amount.deleteOne({_id:id})
+        res.status(200).json("Details Added Successfully")
+    }
+     catch(err){
+         console.log(err+" controllers")
+     }
+}
 
 export const Setting = async(req,res) => {
     const {id, name, gender, email, cashType } = req.body;
