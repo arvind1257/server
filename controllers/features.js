@@ -51,7 +51,16 @@ export const Display = async (req,res) => {
     }
 }
 
-export const Modify = () => {}
+export const Modify = async(req,res) => {
+    const {_id,id,note,amount,type,date,mode} = req.body;
+    try{
+        await Amount.updateOne({_id:_id},{id:id,note:encrypt(note),amount:encrypt(amount),type:type,date:date,mode:mode})
+        res.status(200).json("Details Added Successfully")
+    }
+     catch(err){
+         console.log(err+" controllers")
+     }
+}
 export const Delete = async(req,res) => {
     const {id} = req.body;
     try{
