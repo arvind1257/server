@@ -3,11 +3,11 @@ import bcrypt from "bcryptjs"
 import Feedback from "../modules/feedback.js"
 
 export const Post = async(req,res) => {
-    const {id,name,mess} = req.body
+    const {id,name,mess,count} = req.body
     try{
         const ex = await Feedback.find()
         const messno = ex.length+1
-        await Feedback.create({id:id,name:name,mess:mess,messno:parseInt(messno)})
+        await Feedback.create({id:id,name:name,mess:mess,messno:parseInt(messno),starCount:count})
         res.status(200).json("Details Added Successfully")
 
     }   

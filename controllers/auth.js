@@ -18,18 +18,19 @@ export const usertype = async(req,res) => {
 }
 
 export const signup = async(req,res) => {
-    const {name , dob , gender , email , password } = req.body;
+    const {fname , lname , gender , email , password } = req.body;
+    console.log("fname="+fname)
     try{
        const ex = await User.findOne({email});
         if(ex)
         {
-            return res.status(400).json({ message: "User Already Exists." })
+            return res.status(200).json({ message:"User Already Exists.",status:"Error" })
         }
         const pass = await bcrypt.hash(password,12)
-        const newUser = await User.create({name , dob , gender , email , password:pass  }) 
+        const newUser = await User.create({fname:fname , lname:lname ,gender: gender ,email: email , password:pass  }) 
         const token = Jwt.sign({ email:newUser.email,id:newUser._id},"test",{expiresIn:"1h"})
-        res.status(200).json({result:newUser,token})
-    }
+        res.status(200).json({message:"Thank You, You have successfully registered",status:"Success",result:newUser,token})
+    } 
     catch(err){
         console.log(err+" controllers")
     }
@@ -42,11 +43,11 @@ export const login = async(req,res) => {
        const ex = await User.findOne({email});
         if(!ex)
         {
-            return res.status(400).json({ message: "User Doesn't Exists." })
+            return res.status(200).json({ message:"User Doesn't Exists.",status:"Error"})
         }
         const isPass = await bcrypt.compare(password,ex.password)
         if(!isPass){
-            return res.status(400).json({ message: "Invalid Credentials" })
+            return res.status(200).json({ message:"Invalid Credentials",status:"Error" })
         }
         const token = Jwt.sign({ email:ex.email,id:ex._id},"test",{expiresIn:"1h"})
         res.status(200).json({result:ex,token})

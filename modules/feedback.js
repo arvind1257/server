@@ -5,7 +5,8 @@ const feedbackSchema = mongoose.Schema({
     id :{type:String, required:true},
     name :{type:String, required:true},
     mess :{type:String, required:true},
-    postDate :{type:Date, default:Date.now}
+    postDate :{type:Date, default:Date.now},
+    starCount : { type:Number, default:0 }
 })
 
 

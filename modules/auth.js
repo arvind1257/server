@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema({
-    name :{type:String, required:true},
-    dob :{type:Date, required:true},
+    fname :{type:String, required:true},
+    lname :{type:String, required:true},
     gender :{type:String, required:true},
     email :{type:String, required:true},
     password :{type:String, required:true},
-    userType :{type:String, default:"First Login"},
+    userType :{type:String, default:"Free user"},
     joinedOn :{type:String, default:Date.now}, 
-    cashType :{type:String, default:"inr"}
+    cashType :{type:String, default:"₹"}
 })
 
 export default mongoose.model("User",userSchema)
