@@ -73,9 +73,9 @@ export const Delete = async(req,res) => {
 }
 
 export const Setting = async(req,res) => {
-    const {id, name, gender, email, cashType } = req.body;
+    const {id, fname, lname, gender, email, cashType } = req.body;
     try{
-        await User.updateOne({email:email},{name:name,gender:gender,cashType:cashType})
+        await User.updateOne({email:email},{fname:fname,lname:lname,gender:gender,cashType:cashType})
         const ex = await User.findOne({email})
         const token = Jwt.sign({ email:ex.email,id:ex._id},"test",{expiresIn:"1h"})
         res.status(200).json({result:ex,token})
