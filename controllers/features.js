@@ -27,13 +27,25 @@ export const Add = async(req,res) => {
     const {id,note,amount,type,date,mode} = req.body
     try{
         const ex = await User.findOne({_id:id});
-        if(type==="CASH"){
-            const amt = parseInt(decrypt(ex.cash))-parseInt(amount);
-            await User.updateOne({_id:id},{cash:encrypt(amt.toString())})
+        if(mode!=="income"){
+            if(type==="CASH"){
+                const amt = parseInt(decrypt(ex.cash))-parseInt(amount);
+                await User.updateOne({_id:id},{cash:encrypt(amt.toString())})
+            }
+            else{
+                const amt = parseInt(decrypt(ex.acc))-parseInt(amount);
+                await User.updateOne({_id:id},{acc:encrypt(amt.toString())})
+            }
         }
         else{
-            const amt = parseInt(decrypt(ex.acc))-parseInt(amount);
-            await User.updateOne({_id:id},{acc:encrypt(amt.toString())})
+            if(type==="CASH"){
+                const amt = parseInt(decrypt(ex.cash))+parseInt(amount);
+                await User.updateOne({_id:id},{cash:encrypt(amt.toString())})
+            }
+            else{
+                const amt = parseInt(decrypt(ex.acc))+parseInt(amount);
+                await User.updateOne({_id:id},{acc:encrypt(amt.toString())})
+            }
         }
         const encodeNote = encrypt(note)
         const encodeAmount = encrypt(amount)
@@ -81,28 +93,37 @@ export const Modify = async(req,res) => {
     try{
         const item = await Amount.findOne({_id:_id});
         const ex = await User.findOne({_id:id});
-        if(item.type===type){
-            if(item.type==="CASH"){
-                const amt = parseInt(decrypt(ex.cash))+parseInt(decrypt(item.amount))-parseInt(amount);
-                await User.updateOne({_id:id},{cash:encrypt(amt.toString())})
+        var cash = parseInt(decrypt(ex.cash));
+        var acc = parseInt(decrypt(ex.acc));
+        if(item.mode==="income"){
+            if(item.type==="CASH") cash = cash - parseInt(decrypt(item.amount));
+            else acc = acc - parseInt(decrypt(item.amount));
+        }
+        else{
+            if(item.type==="CASH") cash = cash + parseInt(decrypt(item.amount));
+            else acc = acc + parseInt(decrypt(item.amount));
+        }
+        if(mode==="income"){
+            if(type==="CASH"){
+                const amt = parseInt(cash)+parseInt(amount);
+                await User.updateOne({_id:id},{cash:encrypt(amt.toString()),acc:encrypt(acc.toString())})
             }
             else{
-                const amt = parseInt(decrypt(ex.acc))+parseInt(decrypt(item.amount))-parseInt(amount);
-                await User.updateOne({_id:id},{acc:encrypt(amt.toString())})
+                const amt = parseInt(acc)+parseInt(amount);
+                await User.updateOne({_id:id},{acc:encrypt(amt.toString()),cash:encrypt(cash.toString())})
             }
         }
         else{
-            if(item.type==="CASH"){
-                const amt = parseInt(decrypt(ex.cash))+parseInt(decrypt(item.amount))
-                const amt1 = parseInt(decrypt(ex.acc))-parseInt(amount);
-                await User.updateOne({_id:id},{cash:encrypt(amt.toString()),acc:encrypt(amt1.toString())})
+            if(type==="CASH"){
+                const amt = parseInt(cash)-parseInt(amount);
+                await User.updateOne({_id:id},{cash:encrypt(amt.toString()),acc:encrypt(acc.toString())})
             }
             else{
-                const amt = parseInt(decrypt(ex.cash))-parseInt(amount);
-                const amt1 = parseInt(decrypt(ex.acc))+parseInt(decrypt(item.amount))
-                await User.updateOne({_id:id},{cash:encrypt(amt.toString()),acc:encrypt(amt1.toString())})
+                const amt = parseInt(acc)-parseInt(amount);
+                await User.updateOne({_id:id},{acc:encrypt(amt.toString()),cash:encrypt(cash.toString())})
             }
         }
+
         await Amount.updateOne({_id:_id},{id:id,note:encrypt(note),amount:encrypt(amount),type:type,date:date,mode:mode})
         const ex1 = await User.findOne({_id:id});
         var ex11 = {};
@@ -130,13 +151,31 @@ export const Delete = async(req,res) => {
     try{
         const item = await Amount.findOne({_id:id});
         const ex = await User.findOne({_id:item.id});
-        if(item.type==="CASH"){
-            const amt = parseInt(decrypt(ex.cash))+parseInt(decrypt(item.amount));
-            await User.updateOne({_id:item.id},{cash:encrypt(amt.toString())})
+        console.log(item);
+        console.log(ex);
+        if(item.mode!=="income"){
+            if(item.type==="CASH"){
+                const amt = parseInt(decrypt(ex.cash))+parseInt(decrypt(item.amount));
+                console.log(amt);
+                await User.updateOne({_id:ex._id},{cash:encrypt(amt.toString())});
+            }
+            else{
+                const amt = parseInt(decrypt(ex.acc))+parseInt(decrypt(item.amount));
+                console.log(amt);
+                await User.updateOne({_id:ex._id},{acc:encrypt(amt.toString())});
+            }
         }
         else{
-            const amt = parseInt(decrypt(ex.acc))+parseInt(decrypt(item.amount));
-            await User.updateOne({_id:item.id},{acc:encrypt(amt.toString())})
+            if(item.type==="CASH"){
+                const amt = parseInt(decrypt(ex.cash))-parseInt(decrypt(item.amount));
+                console.log(amt);
+                await User.updateOne({_id:ex._id},{cash:encrypt(amt.toString())});
+            }
+            else{
+                const amt = parseInt(decrypt(ex.acc))-parseInt(decrypt(item.amount));
+                console.log(amt);
+                await User.updateOne({_id:ex._id},{acc:encrypt(amt.toString())});
+            }
         }
         await Amount.deleteOne({_id:id})
         const ex1 = await User.findOne({_id:item.id});
